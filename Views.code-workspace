@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "Public/static"
+		},
+		{
+			"path": "Resources/templates"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Views"
+	}
+}
