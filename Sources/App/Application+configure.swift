@@ -1,7 +1,6 @@
 import Hummingbird
 import Logging
-import NIOCore
-import Mustache
+import Elementary
 
 func buildApplication(
     configuration: ApplicationConfiguration
@@ -9,7 +8,7 @@ func buildApplication(
     
     let logger = {
         var logger = Logger(label: "iankoex")
-        logger.logLevel = .debug
+        logger.logLevel = .info
         return logger
     }()
 
@@ -20,16 +19,7 @@ func buildApplication(
         return HTTPResponse.Status.ok
     }
 
-    // load mustache template library
-    let library = try await MustacheLibrary(directory: "Resources/templates")
-    assert(library.getTemplate(named: "head") != nil, "Set your working directory to the root folder of this example to get it to work")
-
-    guard let errorTemplate = library.getTemplate(named: "error")
-    else {
-        preconditionFailure("Failed to load mustache templates")
-    }
-
-    router.add(middleware: ErrorPageMiddleware(errorTemplate: errorTemplate, mustacheLibrary: library))
+    router.add(middleware: ErrorPageMiddleware())
     // add file middleware to server css and js files
     router.add(middleware: FileMiddleware("Public", logger: logger))
     router.add(middleware: CORSMiddleware(
@@ -39,11 +29,16 @@ func buildApplication(
     ))
 
     // Add routes serving HTML files
-    WebController(mustacheLibrary: library).addRoutes(to: router)
+    WebController().addRoutes(to: router)
 
     let app = Application(
         router: router,
         configuration: configuration,
+        onServerRunning: { _ in
+#if DEBUG
+            browserSyncReload()
+#endif
+        },
         logger: logger
     )
     return app

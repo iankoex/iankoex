@@ -1,21 +1,10 @@
 import Hummingbird
-import Mustache
+import HummingbirdElementary
 
 /// Serves HTML pages
 struct WebController {
-    let mustacheLibrary: MustacheLibrary
-    let homeTemplate: MustacheTemplate
 
-    init(mustacheLibrary: MustacheLibrary) {
-        // get the mustache templates from the library
-        self.mustacheLibrary = mustacheLibrary
-
-        guard let homeTemplate = mustacheLibrary.getTemplate(named: "home") else {
-            preconditionFailure("Failed to load mustache templates")
-        }
-
-        self.homeTemplate = homeTemplate
-    }
+    init() {}
 
     func addRoutes(to router: Router<some RequestContext>) {
         router.group()
@@ -23,8 +12,11 @@ struct WebController {
     }
 
     @Sendable
-    func home(request: Request, context: some RequestContext) async throws -> HTML {
-        let html = self.homeTemplate.render((), library: mustacheLibrary)
-        return HTML(html: html)
+    func home(request: Request, context: some RequestContext) async throws -> some ResponseGenerator {
+        HTMLResponse {
+            MainLayout(title: "Iankoex") {
+                HomePage()
+            }
+        }
     }
 }
