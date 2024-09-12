@@ -14,10 +14,10 @@ let package = Package(
         .macOS(.v14),
     ],
     dependencies: [
-        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0-rc.2"),
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.4.0"),
-        .package(url: "https://github.com/sliemeobn/elementary.git", from: "0.1.2"),
-        .package(url: "https://github.com/hummingbird-community/hummingbird-elementary.git", from: "0.1.0-rc.1"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0"),
+        .package(url: "https://github.com/sliemeobn/elementary.git", from: "0.2.0"),
+        .package(url: "https://github.com/hummingbird-community/hummingbird-elementary.git", from: "0.2.1-rc.1"),
     ],
     targets: [
         .executableTarget(
