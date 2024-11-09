@@ -1,7 +1,7 @@
 # ================================
 # Build image
 # ================================
-FROM swift:5.10-noble as build
+FROM swift:6.0-jammy AS build
 
 # Install OS updates
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
@@ -18,7 +18,7 @@ WORKDIR /build
 # files do not change.
 COPY ./Package.* ./
 RUN swift package resolve \
-    $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
+        $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
 
 # Copy entire repo into container
 COPY . .
@@ -26,8 +26,8 @@ COPY . .
 # Build everything, with optimizations, with static linking, and using jemalloc
 # N.B.: The static version of jemalloc is incompatible with the static Swift runtime.
 RUN swift build -c release \
-    --static-swift-stdlib \
-    -Xlinker -ljemalloc
+                --static-swift-stdlib \
+                -Xlinker -ljemalloc
 
 # Switch to the staging area
 WORKDIR /staging
@@ -49,20 +49,20 @@ RUN [ -d /build/Resources ] && { mv /build/Resources ./Resources && chmod -R a-w
 # ================================
 # Run image
 # ================================
-FROM ubuntu:noble
+FROM ubuntu:jammy
 
 # Make sure all system packages are up to date, and install only essential packages.
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
     && apt-get -q update \
     && apt-get -q dist-upgrade -y \
     && apt-get -q install -y \
-    libjemalloc2 \
-    ca-certificates \
-    tzdata \
-    # If your app or its dependencies import FoundationNetworking, also install `libcurl4`.
-    # libcurl4 \
-    # If your app or its dependencies import FoundationXML, also install `libxml2`.
-    # libxml2 \
+      libjemalloc2 \
+      ca-certificates \
+      tzdata \
+# If your app or its dependencies import FoundationNetworking, also install `libcurl4`.
+      # libcurl4 \
+# If your app or its dependencies import FoundationXML, also install `libxml2`.
+      # libxml2 \
     && rm -r /var/lib/apt/lists/*
 
 # Create a vapor user and group with /app as its home directory
@@ -85,4 +85,4 @@ EXPOSE 8080
 
 # Start the Vapor service when the image is run, default to listening on 8080 in production environment
 ENTRYPOINT ["./App"]
-CMD ["--hostname", "0.0.0.0", "--port", "8080"]
+CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
